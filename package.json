@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.0"
+  },
+  "name": "p3",
+  "version": "1.0.0",
+  "description": "will try to do p2 tasks here but in one file for better understanding",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Talha",
+  "license": "ISC"
+}
