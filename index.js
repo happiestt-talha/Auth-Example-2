@@ -16,34 +16,43 @@ const posts=[
 
 app.use(express.json())
 
-const authenticateToken=(rea,res,next)=>{
-    
+const authenticateToken=(req,res,next)=>{
+    const authHeader=req.headers['authorization'];
+    const authToken=authHeader && authHeader.split(' ')[1];
+
+    if(!authToken) return res.sendStatus(401).json({ERROR:"You didn't provided access Token yet..."})
+    jwt.verify(authToken,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
+        if(err) return res.sendStatus(403).json({ERROR:"You don't have access with this token..."})
+        req.user=user
+        next()
+    })
+
 }
 app.get('/',(req,res)=>{
     res.json({msg:"hello from '/'"})
 })
 
-app.get('/posts',(req,res)=>{
-    const authHeaders=req.headers['authorization']
-    const uName=req.body.name;
-    // const response=
-    res.json({
-        authHeaders:authHeaders,
-        posts:posts.filter(post=>post.name==uName)
+app.get('/posts',authenticateToken,(req,res)=>{
+    try{
+        if(req.user.name==req.body.name){
+            res.json({
+                posts:posts.filter(post=>post.name==req.user.name)
+            })
+        }else{
+            res.json({ERROR:"You don't have access with this token..."})
+        }
+    }catch(err){
+        res.json({ERROR:err})
+    }
     })
-    // res.json({uName})
-})
 
 app.post('/login',(req,res)=>{
-    // res.json({msg:"hello from '/login'"})
 
     const username=req.body.name;
     const user={name:username}
 
     const authToken= jwt.sign(user,process.env.ACCESS_TOKEN_SECRET)
     res.json({
-        reqName:req.body.name,
-        user:user,
         userName:user.name,
         authToken:authToken
     })
